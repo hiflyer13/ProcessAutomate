@@ -1,32 +1,35 @@
-import tkinter as tk
 import importlib
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QVBoxLayout, QFrame, QSpacerItem, QSizePolicy
 
+class MainMenu(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("ProcessAutomate")
+        self.setGeometry(100, 100, 800, 650)
 
-class MainMenu:
-    def __init__(self, master):
-        self.master = master
-        self.master.configure(bg="#f0f0f0")
+        # Set up the main widget and layout
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+        self.layout.setAlignment(Qt.AlignCenter)  # Center the layout
 
         # Application title
-        self.title_frame = tk.Frame(master, bg="#f0f0f0")
-        self.title_frame.pack(pady=30)
+        self.title_frame = QFrame(self.central_widget)
+        self.layout.addWidget(self.title_frame)
 
-        self.title_label = tk.Label(
-            self.title_frame,
-            text="ProcessAutomate",
-            font=("Arial", 24, "bold"),
-            bg="#f0f0f0"
-        )
-        self.title_label.pack()
+        self.title_label = QLabel("ProcessAutomate")
+        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        self.title_frame.setLayout(QVBoxLayout())
+        self.title_frame.layout().addWidget(self.title_label)
 
-        # Buttons frame
-        self.button_frame = tk.Frame(master, bg="#f0f0f0")
-        self.button_frame.pack(pady=20)
+        # Spacer to push buttons down
+        self.layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
         # Button styling
-        button_width = 20
-        button_height = 2
-        button_font = ("Arial", 12)
+        button_width = 200
+        button_height = 50
+        button_font = "Arial"
         button_bg = "#4a7abc"
         button_fg = "white"
         pady_between = 15
@@ -36,18 +39,18 @@ class MainMenu:
         modules = ["DPD", "Foxpost", "GLS", "MPL", "OTP", "Simple Pay"]
 
         for module in modules:
-            button = tk.Button(
-                self.button_frame,
-                text=module,
-                width=button_width,
-                height=button_height,
-                font=button_font,
-                bg=button_bg,
-                fg=button_fg,
-                command=lambda m=module: self.open_module(m)
-            )
-            button.pack(pady=pady_between)
+            button = QPushButton(module)
+            button.setFixedSize(button_width, button_height)
+            button.setStyleSheet(f"background-color: {button_bg}; color: {button_fg}; font: {button_font};")
+            button.clicked.connect(lambda checked, m=module: self.open_module(m))
+            self.layout.addWidget(button)
             self.buttons.append(button)
+
+            # Add a spacer between buttons
+            self.layout.addSpacerItem(QSpacerItem(20, pady_between, QSizePolicy.Minimum, QSizePolicy.Fixed))
+
+        # Final spacer to push buttons up
+        self.layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
     def open_module(self, module_name):
         # Convert module name to lowercase for file naming
@@ -58,16 +61,18 @@ class MainMenu:
             module = importlib.import_module(module_file)
 
             # Hide main window
-            self.master.withdraw()
+            self.hide()
 
             # Create a new window
-            module_window = tk.Toplevel(self.master)
-            module_window.title(f"ProcessAutomate - {module_name}")
-            module_window.geometry("800x600")
+            module_window = QMainWindow()
+            module_window.setWindowTitle(f"ProcessAutomate - {module_name}")
+            module_window.setGeometry(100, 100, 800, 600)
 
             # Initialize the module's window class
             window_class = getattr(module, f"{module_name.replace(' ', '')}Window")
-            window_class(module_window, self.master)
+            window_class(module_window, self)
+
+            module_window.show()
 
         except (ImportError, AttributeError) as e:
             print(f"Error loading module {module_name}: {e}")

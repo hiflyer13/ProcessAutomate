@@ -1,11 +1,9 @@
-import tkinter as tk
+import sys
+from PyQt5.QtWidgets import QApplication
 from main_menu import MainMenu
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.title("ProcessAutomate")
-    root.geometry("800x650")
-
-    app = MainMenu(root)
-
-    root.mainloop()
+    app = QApplication(sys.argv)
+    main_menu = MainMenu()
+    main_menu.show()
+    sys.exit(app.exec_())

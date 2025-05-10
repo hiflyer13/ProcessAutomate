@@ -1,6 +1,7 @@
 import importlib
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QPushButton, QVBoxLayout, QFrame, QSpacerItem, QSizePolicy
+import xlrd
 
 class MainMenu(QMainWindow):
     def __init__(self):
